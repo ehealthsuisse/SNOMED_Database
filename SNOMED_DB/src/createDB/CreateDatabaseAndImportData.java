@@ -4,11 +4,27 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 
 public class CreateDatabaseAndImportData {
-	
+	enum ReleaseFileType {
+		FULL("Full"),
+		SNAPSHOT("Snapshot");
+
+		private String releaseFileType;
+
+		private ReleaseFileType(String releaseFileType) {
+			this.releaseFileType = releaseFileType;
+		}
+
+		public String getReleaseFileType() {
+			return this.releaseFileType;
+		}
+	};
+
 	// Driver needed to connect to the SNOMED database
 	public static Connection conn = null;
 	static String ReleaseFilePath= "PATH_TO_YOUR_INTERNATIONAL_EDITION";
+	static String ReleaseFileTypeSI = ReleaseFileType.FULL.getReleaseFileType();
 	static String ReleaseFilePathCH= "PATH_TO_YOUR_SWISS_EXTENSION";
+	static String ReleaseFileTypeCH = ReleaseFileType.FULL.getReleaseFileType();
 	static String ReleaseDate="20250101";
 	static String ReleaseDateCH="CH1000195_20241207";
 
@@ -16,8 +32,8 @@ public class CreateDatabaseAndImportData {
 	        // Datenbankverbindung konfigurieren
 	        String dbName = "SCT:CH_Dec24";
 	        String jdbcDriver = "com.mysql.cj.jdbc.Driver";
-	    	
-	    	
+
+
 	    	//Credential for the connection
 	    	String dbUser = "root";
 	    	String dbPassword = "";
@@ -25,10 +41,10 @@ public class CreateDatabaseAndImportData {
 	    	String multiQueries="?allowMultiQueries=true";
 	    	String allowLoadLocalInfile= "allowLoadLocalInfile=true";
 
-	    	
+
 
 	        try {
-	        	
+
 	            // Verbindung zur Datenbank herstellen
 	        	Class.forName(jdbcDriver);
 	            Connection connection = DriverManager.getConnection(dbURL + multiQueries, dbUser, dbPassword);
@@ -45,7 +61,7 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(createDBQuery);
 	            System.out.println("Database "+dbName+" created successfully!");
 
-	            // Verbindung zur neuen Datenbank herstellen        
+	            // Verbindung zur neuen Datenbank herstellen
 	            connection = DriverManager.getConnection(dbURL + dbName+ multiQueries+"&"+ allowLoadLocalInfile, dbUser, dbPassword);
 	            statement = connection.createStatement();
 
@@ -65,7 +81,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_concept created successfully!");
 
 
-	            
+
 	            String createDescriptionTableQuery = "DROP TABLE IF EXISTS `full_description`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_description` (\r\n"
@@ -85,7 +101,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_description created successfully!");
 
 
-	            
+
 	            String createRelationshipTableQuery = "DROP TABLE IF EXISTS `full_relationship`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_relationship` (\r\n"
@@ -106,7 +122,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_relationship created successfully!");
 
 
-	            
+
 	            String createSimpleRefsetTableQuery = "DROP TABLE IF EXISTS `full_refset_Simple`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_refset_Simple` (\r\n"
@@ -124,7 +140,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_refset_Simple created successfully!");
 
 
-	            
+
 	            String createExtendedMapRefsetTableQuery = "DROP TABLE IF EXISTS `full_refset_ExtendedMap`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_refset_ExtendedMap` (\r\n"
@@ -149,7 +165,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_refset_ExtendedMap created successfully!");
 
 
-	            
+
 	            String createLanguageRefsetTableQuery = "DROP TABLE IF EXISTS `full_refset_Language`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_refset_Language` (\r\n"
@@ -168,7 +184,7 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Table full_refset_Language created successfully!");
 
 
-	            
+
 	            String createModuleDependencyRefsetTableQuery = "DROP TABLE IF EXISTS `full_refset_ModuleDependency`;\r\n"
 	            		+ " \r\n"
 	            		+ "CREATE TABLE `full_refset_ModuleDependency` (\r\n"
@@ -192,7 +208,7 @@ public class CreateDatabaseAndImportData {
 
 
 	            //Import of the international Edition
-	            String importConceptsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Terminology\\\\sct2_Concept_Full_INT_"+ReleaseDate+".txt'\r\n"
+	            String importConceptsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Terminology\\\\sct2_Concept_" + ReleaseFileTypeSI + "_INT_"+ReleaseDate+".txt'\r\n"
 	            		+ "INTO TABLE `full_concept`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -201,8 +217,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importConceptsIntEdQuery);
 	            System.out.println("Import SNOMED Interntaional Edition Release "+ReleaseDate+" concepts successful!");
 
-	            
-	            String importDescriptionIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Terminology\\\\sct2_Description_Full-en_INT_"+ReleaseDate+".txt'\r\n"
+
+	            String importDescriptionIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Terminology\\\\sct2_Description_" + ReleaseFileTypeSI + "-en_INT_"+ReleaseDate+".txt'\r\n"
 	            		+ "INTO TABLE `full_description`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -212,8 +228,8 @@ public class CreateDatabaseAndImportData {
 	            System.out.println("Import SNOMED Interntaional Edition Release "+ReleaseDate+" descriptions successful!");
 
 
-	            
-	            String importRelationshipIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Terminology\\\\sct2_Relationship_Full_INT_"+ReleaseDate+".txt'\r\n"
+
+	            String importRelationshipIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Terminology\\\\sct2_Relationship_" + ReleaseFileTypeSI + "_INT_"+ReleaseDate+".txt'\r\n"
 	            		+ "INTO TABLE `full_relationship`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -224,7 +240,7 @@ public class CreateDatabaseAndImportData {
 
 
 //	            The international Edition does not have a simple refset
-//	            String importSimpleRefsetIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Content\\\\der2_Refset_SimpleFull_INT_"+ReleaseDate+".txt'\r\n"
+//	            String importSimpleRefsetIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Content\\\\der2_Refset_Simple" + ReleaseFileTypeSI + "_INT_"+ReleaseDate+".txt'\r\n"
 //	            		+ "INTO TABLE `full_refset_simple`\r\n"
 //	            		+ "LINES TERMINATED BY '\\\\r\\\\n'\r\n"
 //	            		+ " IGNORE 1 LINES\r\n"
@@ -232,8 +248,8 @@ public class CreateDatabaseAndImportData {
 //	            statement.executeUpdate(importSimpleRefsetIntEdQuery);
 //	            System.out.println(importSimpleRefsetIntEdQuery);
 
-	            
-	            String importLanguageRefsetsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Refset\\\\Language\\\\der2_cRefset_LanguageFull-en_INT_"+ReleaseDate+".txt'\r\n"
+
+	            String importLanguageRefsetsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Refset\\\\Language\\\\der2_cRefset_Language" + ReleaseFileTypeSI + "-en_INT_"+ReleaseDate+".txt'\r\n"
 	            		+ "INTO TABLE `full_refset_Language`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -242,18 +258,18 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importLanguageRefsetsIntEdQuery);
 	            System.out.println("Import SNOMED Interntaional Edition Release "+ReleaseDate+" language refsets successful!");
 
-	            
-//	            TODO: beim Ausführen macht mapGroup ein Problem. 
-//	            String importExtendedMapRefsetsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\Full\\\\Refset\\\\Map\\\\der2_iisssccRefset_ExtendedMapFull_INT_"+ReleaseDate+".txt'\r\n"
+
+//	            TODO: beim Ausführen macht mapGroup ein Problem.
+//	            String importExtendedMapRefsetsIntEdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePath+"\\\\" + ReleaseFileTypeSI + "\\\\Refset\\\\Map\\\\der2_iisssccRefset_ExtendedMap" + ReleaseFileTypeSI + "_INT_"+ReleaseDate+".txt'\r\n"
 //	            		+ "INTO TABLE `full_refset_Language`\r\n"
 //	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 //	            		+ " IGNORE 1 LINES\r\n"
 //	            		+ "(`id`,`effectiveTime`,`active`,`moduleId`,`refsetId`,`referencedComponentId`,`mapGroup`,`mapPriority`,`mapRule`,`mapAdvice`,`mapTarget`,`correlationId`,`mapCategoryId`);";
 //	            statement.executeUpdate(importExtendedMapRefsetsIntEdQuery);
 //	            System.out.println(importExtendedMapRefsetsIntEdQuery);
-	            
+
 	            //Import of the Swiss Extension
-	            String importConceptsCHdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Concept_Full_"+ReleaseDateCH+".txt'\r\n"
+	            String importConceptsCHdQuery = "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Concept_" + ReleaseFileTypeCH + "_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_concept`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -262,8 +278,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importConceptsCHdQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" concepts successful!");
 
-	            
-	            String importDescriptionDeCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Description_Full-de-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importDescriptionDeCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Description_" + ReleaseFileTypeCH + "-de-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_description`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -272,8 +288,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importDescriptionDeCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" german descriptions successful!");
 
-	            
-	            String importDescriptionFrCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Description_Full-fr-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importDescriptionFrCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Description_" + ReleaseFileTypeCH + "-fr-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_description`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -282,8 +298,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importDescriptionFrCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" french descriptions successful!");
 
-	            
-	            String importDescriptionItCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Description_Full-it-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importDescriptionItCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Description_" + ReleaseFileTypeCH + "-it-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_description`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -292,8 +308,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importDescriptionItCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" italian descriptions successful!");
 
-	            
-	            String importDescriptionEnCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Description_Full-en_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importDescriptionEnCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Description_" + ReleaseFileTypeCH + "-en_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_description`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -302,8 +318,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importDescriptionEnCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" english descriptions successful!");
 
-	            
-	            String importRelationshipCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Terminology\\\\sct2_Relationship_Full_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importRelationshipCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Terminology\\\\sct2_Relationship_" + ReleaseFileTypeCH + "_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_relationship`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -312,16 +328,16 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importRelationshipCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" relationship successful!");
 
-	            
+
 	            //The swiss extension does not contain a simple refset
-//	            String importSimpleRefsetCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Content\\\\der2_Refset_SimpleFull_INT_"+ReleaseDateCH+".txt'\r\n"
+//	            String importSimpleRefsetCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Content\\\\der2_Refset_Simple" + ReleaseFileTypeCH + "_INT_"+ReleaseDateCH+".txt'\r\n"
 //	            		+ "INTO TABLE `full_refset_simple`\r\n"
 //	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 //	            		+ " IGNORE 1 LINES\r\n"
 //	            		+ "(`id`,`effectiveTime`,`active`,`moduleId`,`refSetId`,`referencedComponentId`);";
 //	            statement.executeUpdate(importSimpleRefsetCHQuery);
-	            
-	            String importLanguageRefsetsDeCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Refset\\\\Language\\\\der2_cRefset_LanguageFull-de-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importLanguageRefsetsDeCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Refset\\\\Language\\\\der2_cRefset_Language" + ReleaseFileTypeCH + "-de-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_refset_Language`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -330,8 +346,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importLanguageRefsetsDeCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" german language refset successful!");
 
-	            
-	            String importLanguageRefsetsFrCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Refset\\\\Language\\\\der2_cRefset_LanguageFull-fr-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importLanguageRefsetsFrCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Refset\\\\Language\\\\der2_cRefset_Language" + ReleaseFileTypeCH + "-fr-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_refset_Language`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -340,8 +356,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importLanguageRefsetsFrCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" french language refset successful!");
 
-	            
-	            String importLanguageRefsetsItCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Refset\\\\Language\\\\der2_cRefset_LanguageFull-it-ch_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importLanguageRefsetsItCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Refset\\\\Language\\\\der2_cRefset_Language" + ReleaseFileTypeCH + "-it-ch_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_refset_Language`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -350,8 +366,8 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importLanguageRefsetsItCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" italian language refset successful!");
 
-	            
-	            String importLanguageRefsetsEnCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Refset\\\\Language\\\\der2_cRefset_LanguageFull-en_"+ReleaseDateCH+".txt'\r\n"
+
+	            String importLanguageRefsetsEnCHQuery= "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Refset\\\\Language\\\\der2_cRefset_Language" + ReleaseFileTypeCH + "-en_"+ReleaseDateCH+".txt'\r\n"
 	            		+ "INTO TABLE `full_refset_Language`\r\n"
 	            		+ "LINES TERMINATED BY '\\r\\n'\r\n"
 	            		+ " IGNORE 1 LINES\r\n"
@@ -360,9 +376,9 @@ public class CreateDatabaseAndImportData {
 //	            System.out.println(importLanguageRefsetsEnCHQuery);
 	            System.out.println("Import Swiss Extension Release "+ReleaseDateCH+" english language refset successful!");
 
-	            
+
 	            //The swiss extension does not contain a map
-//	            String importExtendedMapRefsetsIntEdQueryCH = "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\Full\\\\Refset\\\\Map\\\\der2_iisssccRefset_ExtendedMapFull_INT_"+ReleaseDateCH+".txt'\r\n"
+//	            String importExtendedMapRefsetsIntEdQueryCH = "LOAD DATA LOCAL INFILE '"+ReleaseFilePathCH+"\\\\" + ReleaseFileTypeCH + "\\\\Refset\\\\Map\\\\der2_iisssccRefset_ExtendedMap" + ReleaseFileTypeCH + "_INT_"+ReleaseDateCH+".txt'\r\n"
 //	            		+ "INTO TABLE `full_refset_Language`\r\n"
 //	            		+ "LINES TERMINATED BY '\\\r\\\\n'\r\n"
 //	            		+ " IGNORE 1 LINES\r\n"
@@ -383,7 +399,7 @@ public class CreateDatabaseAndImportData {
 				}
 
 				System.out.println("Indexe wurden hinzugefügt.");
-      
+
 	            // Verbindung schließen
 	            statement.close();
 	            connection.close();
