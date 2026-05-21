@@ -22,7 +22,7 @@ This Java project creates a MySQL database and imports SNOMED CT data, including
 - Java 8 or higher
 - MySQL 8.x
 - MySQL Connector/J (JDBC driver)
-- SNOMED CT Full release files:
+- SNOMED CT Full release files (download here: https://mlds.ihtsdotools.org/ (registration required):
   - **International Edition**
   - **Swiss Extension**
 
@@ -90,13 +90,9 @@ To run this project using Eclipse:
    - Go to `File` > `Import...` > `General` > `Existing Projects into Workspace` > `Next`.
    - Browse to the folder containing this project.
    - Click `Finish`.
+     
 
-2. **Add the MySQL JDBC driver to the build path**
-   - Download the [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) (JAR file).
-   - Right-click the project in the Project Explorer and select `Build Path` > `Configure Build Path...`.
-   - Under the `Libraries` tab, click `Add External JARs...` and select the downloaded `mysql-connector-java-x.x.x.jar`.
-
-3. **Edit the configuration if needed**
+2. **Edit the configuration if needed**
    - In the class `CreateDatabaseAndImportData.java`, update the following variables to match your system:
      ```java
      static String ReleaseFilePath = "C:\\Path\\To\\InternationalEdition";
@@ -105,11 +101,11 @@ To run this project using Eclipse:
      static String ReleaseDateCH = "CH1000195_20241207";
      ```
 
-4. **Run the program**
+3. **Run the program**
    - Right-click the class `CreateDatabaseAndImportData.java`.
    - Select `Run As` > `Java Application`.
 
-5. **Verify the result**
+4. **Verify the result**
    - The MySQL database `SCT:CH_Dec24` should now be created.
    - Tables will be created and populated with SNOMED CT data.
    - The Eclipse console will show logs confirming successful steps.
